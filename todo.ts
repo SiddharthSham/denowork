@@ -1,4 +1,5 @@
 import { Application, Router } from 'https://deno.land/x/oak/mod.ts'
+import { oakCors } from "https://deno.land/x/cors/mod.ts";
 
 const env = Deno.env.toObject()
 const PORT = env.PORT || 8000
@@ -24,7 +25,7 @@ let todos: Array<Todo> = [
 ]
 
 export const getTodos = ({ response }: { response: any }) => {
-  response.body = todos
+  response.body = {todos}
 }
 
 export const getTodo = ({
@@ -54,6 +55,7 @@ export const addTodo = async ({
   request: any
   response: any
 }) => {
+  console.log('Request recieved!')
   const body = await request.body()
   const { title, task, done }: { title: string; task: string, done: boolean } = body.value
   todos.push({
@@ -124,9 +126,10 @@ router
 
 const app = new Application()
 
+app.use(oakCors());
 app.use(router.routes())
 app.use(router.allowedMethods())
 
-console.log(`Listening on port ${PORT}...`)
+console.log(`Listening on port: ${PORT}...`)
 
 await app.listen(`${HOST}:${PORT}`)
